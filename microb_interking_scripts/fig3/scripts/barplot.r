@@ -1,0 +1,6 @@
+test=read.table("dump.txt",header=T)
+xx=sweep(test,2,colSums(test),"/")
+par(mar=c(15,3,3,15),xpd=T)
+barplot(as.matrix(xx),col=rainbow(9),las=2)
+legend(3,0.5,rownames(test),fill=rainbow(9))
+dev.print(pdf,"barplot.pdf")

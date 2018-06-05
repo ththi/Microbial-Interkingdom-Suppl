@@ -1,0 +1,15 @@
+##draw figure
+library(ggplot2)
+
+p<- ggplot(Figure4B_XXX_inputdata, aes(x=Community, y=observed_species))+
+	geom_boxplot(alpha=.2, size=1.5)+
+	geom_jitter(aes(height=0, size=4, fill="white"))+
+	theme(
+	panel.background = element_rect(fill = "transparent",colour = NA),
+    plot.background = element_rect(fill = "transparent",colour = NA)
+   )
+##calculate significant differences
+
+library(agricolae)
+
+kruskal(Figure4B_XX_inputdata$Relative_to_MF, Figure4B_XX_inputdata$Condition, alpha=0.05, p.adj="bonferroni")$groups

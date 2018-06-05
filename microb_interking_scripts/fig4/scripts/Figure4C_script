@@ -1,0 +1,37 @@
+##calculate raltive abundances from otu_table (that already contains strain names)
+otu_table_norm <- apply(otu_table, 2, function(x) x/sum(x))
+
+#for bacterial relative abundances, compile by Phylum/Class
+level <- which(colnames(taxonomy)=="Phylum")
+otu_table_tax<- aggregate(otu_table_norm, by=list(taxonomy[, level]), FUN=sum)
+otu_table_tax<- t(otu_table_tax)
+colnames(otu_table_tax)<- otu_table_tax[1,]
+otu_table_tax<- otu_table_tax[-1,]
+
+##made long format for ggplot
+library(reshape2)
+otu_long <- melt(otu_table_norm, id.vars = "Sample", variable.name = "Strain")
+
+##colors
+
+#Bacteria
+colors <- data.frame(group=c("Proteobacteria", "Actinobacteria", "Bacteroidetes", "Firmicutes"),
+					color=c("#2BB065","#EF5656", "#47B3DA", "#F7A415")) 
+otu_table_tax$Phylum<- factor(otu_table_tax$Phylum, levels=c("Proteobacteria", "Actinobacteria", "Bacteroidetes", "Firmicutes"))
+
+#Fungi
+colors <- data.frame(group=c("Zalerion_varium_11_135", "Zalerion_varium_12_131", "Dendryphion_nanum_13_243", "Verticillum_dahliae_14_001", "Verticillum_dahliae_15_003", "Plectosphaerella_cucumerina_17_143","Plectosphaerella_cucumerina_18_010","Chaetomium_grande_19_009","Chaetomium_megalocarpum_20_207","Microdochium_tricholadiopsis_21_230","Cylindrocarpon_sp_22_241","Stachybotrys_elegans_23_235","Ilyonectria_sp_24_026","Neonectria_radicicola_25A_134","Ilyonectria_radicicola_25B_236","Ilyonectria_macrodydima_26_147","Ilyonectria_sp_27_021","Ilyonectria_sp_28_022","Ilyonectria_sp_29_018","Ilyonectria_sp_30_136","Fusarium_culmorum_31_201","Fusarium_incarnatum_32_113","Fusarium_oxysporum_34_224","Fusarium_oxysporum_38_216","Fusarium_redolens_39_115","Fusarium_redolens_40_023","Fusarium_oxysporum_42_102","Fusarium_oxysporum_44_226","Fusarium_oxysporum_45_105","Fusarium_oxysporum_46_031","Fusarium_oxysporum_47_214","Fusarium_oxysporum_48A_212","Fusarium_oxysporum_48B_112","Fusarium_oxysporum_49_013"),
+                     color=c("#c993c9","#ffc01f","#ffcf9f","#df7000","#ff8b00","#7f2626","#5d4500","#ffc04c","#bebf00","#a56767","#999793","#0c3f00","#8e858e","#56524b","#9fdeff","#7f6065","#d8cfbd","#b266b2","#008000","#7f6026","#e85400","#008000","#eda5a5","#ff4c4c","#db4c87","#000d9f","#ff0000","#ff8b3f","#3d513d","#00ff1e","#99cc99","#eedeee","#cc0000","#66b266"))
+otu_table_norm_fungi$Strain <- factor(otu_table_norm_fungi$Strain, levels=c("Zalerion_varium_11_135", "Zalerion_varium_12_131", "Dendryphion_nanum_13_243", "Verticillum_dahliae_14_001", "Verticillum_dahliae_15_003", "Plectosphaerella_cucumerina_17_143","Plectosphaerella_cucumerina_18_010","Chaetomium_grande_19_009","Chaetomium_megalocarpum_20_207","Microdochium_tricholadiopsis_21_230","Cylindrocarpon_sp_22_241","Stachybotrys_elegans_23_235","Ilyonectria_sp_24_026","Neonectria_radicicola_25A_134","Ilyonectria_radicicola_25B_236","Ilyonectria_macrodydima_26_147","Ilyonectria_sp_27_021","Ilyonectria_sp_28_022","Ilyonectria_sp_29_018","Ilyonectria_sp_30_136","Fusarium_culmorum_31_201","Fusarium_incarnatum_32_113","Fusarium_oxysporum_34_224","Fusarium_oxysporum_38_216","Fusarium_redolens_39_115","Fusarium_redolens_40_023","Fusarium_oxysporum_42_102","Fusarium_oxysporum_44_226","Fusarium_oxysporum_45_105","Fusarium_oxysporum_46_031","Fusarium_oxysporum_47_214","Fusarium_oxysporum_48A_212","Fusarium_oxysporum_48B_112","Fusarium_oxysporum_49_013"))
+
+#Oomycetes
+colors <- data.frame(group=c("Pythium_ultimum_2_210", "Pythium_sp_7_227", "Pythium_violae_35_229", "Pythium_sylvaticum_4_132", "Pythium_sp_1_004", "Pythium_ultimum_3_007"),
+                     color=c("#c1e4ff","#99d3ff","#879fb2","#99abff","#b7c5d0","#dbe2e7")
+otu_table_norm_oomy$Strain <- factor(otu_table_norm_oomy$Strain, levels=c("Pythium_ultimum_2_210", "Pythium_sp_7_227", "Pythium_violae_35_229", "Pythium_sylvaticum_4_132", "Pythium_sp_1_004", "Pythium_ultimum_3_007"))
+
+##plot
+library(ggplot2)
+p<- ggplot(otu_table_norm, aes(x = Sample, y = value, fill = Strain)) + 
+     geom_bar(stat = "identity", colour="black")+
+     scale_fill_manual(values=as.character(colors$color)) +
+     theme(axis.text.x = element_text(size=10, angle=45))

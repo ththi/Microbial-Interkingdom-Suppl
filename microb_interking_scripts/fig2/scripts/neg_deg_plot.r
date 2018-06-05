@@ -1,0 +1,7 @@
+test=read.table("dump.txt",header=F)
+plot(test[,2],test[,3],xlab="Frequency of negative BF connections",ylab="Betweeness centrality (BF)")
+fun=grep("fun",test[,1])
+bac=grep("fun",test[,1],invert=T)
+points(test[fun,2],test[fun,3],col="orange",pch=19)
+points(test[bac,2],test[bac,3],col="cyan",pch=19)
+dev.print(pdf,"neg_deg_cen.pdf")
